@@ -2,6 +2,7 @@
 
 import { BarChart } from "@mantine/charts";
 import {
+  Anchor,
   Button,
   Card,
   Container,
@@ -17,11 +18,17 @@ import {
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
-import { IconMoonStars, IconSun, IconUpload } from "@tabler/icons-react";
+import {
+  IconBrandGithub,
+  IconMoonStars,
+  IconSun,
+  IconUpload,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import "dayjs/locale/id";
 import isoWeek from "dayjs/plugin/isoWeek";
 import weekOfYear from "dayjs/plugin/weekOfYear";
+import Link from "next/link";
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -275,6 +282,20 @@ const App = () => {
           )}
         </Stack>
       </Card>
+      <Anchor
+        component={Link}
+        href="https://github.com/shafanaura/upwork-earning"
+        target="_blank"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          justifyContent: "end",
+        }}
+      >
+        <IconBrandGithub />
+        <p>Source Code</p>
+      </Anchor>
     </Container>
   );
 };
