@@ -1,5 +1,15 @@
+import mantineTheme from "@/theme/mantineTheme";
+import "@mantine/charts/styles.css";
+import {
+  ColorSchemeScript,
+  mantineHtmlProps,
+  MantineProvider,
+} from "@mantine/core";
+import "@mantine/core/styles.css";
+import { emotionTransform, MantineEmotionProvider } from "@mantine/emotion";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { RootStyleRegistry } from "./EmotionRootStyleRegistry";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,9 +33,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <RootStyleRegistry>
+          <MantineProvider
+            defaultColorScheme="dark"
+            stylesTransform={emotionTransform}
+            theme={mantineTheme}
+          >
+            <MantineEmotionProvider>{children}</MantineEmotionProvider>
+          </MantineProvider>
+        </RootStyleRegistry>
       </body>
     </html>
   );
