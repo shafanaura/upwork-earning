@@ -10,7 +10,6 @@ import {
   Group,
   Paper,
   rem,
-  SegmentedControl,
   Stack,
   Switch,
   Text,
@@ -59,31 +58,8 @@ const groupByMonth = (data: Array<{ Date: string; Amount: string }>) => {
   }));
 };
 
-const groupByWeek = (data: Array<{ Date: string; Amount: string }>) => {
-  const groupedData = data.reduce((acc, row) => {
-    const date = dayjs(row.Date);
-    if (!date.isValid()) return acc;
-
-    const year = date.year();
-    const month = date.month() + 1; // Months are 0-based in dayjs
-    const week = date.isoWeek(); // ISO week number
-    const key = `${year}-${String(month).padStart(2, "0")}-WEEK-${week}`; // Format: 2024-02-WEEK-1
-
-    const amount = parseFloat(row.Amount) || 0;
-
-    acc[key] = (acc[key] || 0) + amount;
-    return acc;
-  }, {} as Record<string, number>);
-
-  return Object.entries(groupedData).map(([week, earn]) => ({
-    week,
-    earn,
-  }));
-};
-
 const App = () => {
   const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
-  const [viewMode, setViewMode] = useState("monthly");
   const [file, setFile] = useState<File | null>(null);
   const [chartData, setChartData] = useState<IChartData[]>([]);
 
@@ -98,9 +74,7 @@ const App = () => {
       skipEmptyLines: true,
       complete: (result) => {
         const data = result.data as Array<{ Date: string; Amount: string }>;
-        const groupedData =
-          viewMode === "monthly" ? groupByMonth(data) : groupByWeek(data);
-
+        const groupedData = groupByMonth(data);
         const labels = Object.keys(groupedData).sort();
         const amounts = labels.map((label) => groupedData[label]);
         setChartData(amounts);
@@ -117,7 +91,7 @@ const App = () => {
     if (file) {
       calculateEarnings();
     }
-  }, [file, viewMode]);
+  }, [file]);
 
   // Handle drag-and-drop file upload
   const { getRootProps, getInputProps } = useDropzone({
@@ -172,18 +146,8 @@ const App = () => {
             />
           </Group>
           <Text ta="center" color="dimmed" size="lg">
-            Upload your CSV file to visualize monthly or weekly revenue trends.
+            Upload your CSV file to visualize monthly revenue trends.
           </Text>
-
-          <SegmentedControl
-            value={viewMode}
-            onChange={setViewMode}
-            data={[
-              { label: "Monthly", value: "monthly" },
-              { label: "Weekly", value: "weekly" },
-            ]}
-            maw={300}
-          />
 
           <Paper
             {...getRootProps()}
@@ -256,7 +220,7 @@ const App = () => {
             <BarChart
               h={300}
               data={chartData}
-              dataKey={viewMode === "monthly" ? "month" : "week"}
+              dataKey="month"
               series={[
                 {
                   name: "earn",
