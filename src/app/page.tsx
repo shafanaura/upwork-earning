@@ -41,21 +41,44 @@ interface IChartData {
 }
 
 const groupByMonth = (data: Array<{ Date: string; Amount: string }>) => {
-  const groupedData = data.reduce((acc, row) => {
+  // Sort the data first by date
+  const sortedData = [...data].sort((a, b) => {
+    const dateA = dayjs(a.Date);
+    const dateB = dayjs(b.Date);
+    return dateA.valueOf() - dateB.valueOf();
+  });
+
+  const groupedData = sortedData.reduce((acc, row) => {
     const date = dayjs(row.Date);
     if (!date.isValid()) return acc;
 
     const month = date.format("YYYY-MM");
     const amount = parseFloat(row.Amount) || 0;
 
-    acc[month] = (acc[month] || 0) + amount;
+    if (!acc[month]) {
+      acc[month] = 0;
+    }
+    acc[month] += amount;
     return acc;
   }, {} as Record<string, number>);
 
-  return Object.entries(groupedData).map(([month, earn]) => ({
-    month,
-    earn,
-  }));
+  // Convert to array and ensure proper sorting
+  const monthArray = Object.entries(groupedData)
+    .map(([month, earn]) => ({
+      month,
+      earn,
+    }))
+    .sort((a, b) => {
+      const [yearA, monthA] = a.month.split("-").map(Number);
+      const [yearB, monthB] = b.month.split("-").map(Number);
+
+      if (yearA !== yearB) {
+        return yearA - yearB;
+      }
+      return monthA - monthB;
+    });
+
+  return monthArray;
 };
 
 const App = () => {
@@ -75,13 +98,8 @@ const App = () => {
       complete: (result) => {
         const data = result.data as Array<{ Date: string; Amount: string }>;
         const groupedData = groupByMonth(data);
-        const labels = Object.keys(groupedData).sort();
-        const amounts = labels.map((label) => groupedData[label]);
-        setChartData(amounts);
-
-        const total = amounts
-          .map((item) => item.earn)
-          .reduce((sum, amount) => sum + amount, 0);
+        setChartData(groupedData);
+        const total = groupedData.reduce((sum, item) => sum + item.earn, 0);
         setTotalEarnings(total);
       },
     });
