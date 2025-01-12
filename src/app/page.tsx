@@ -84,6 +84,12 @@ const groupByMonth = (data: Array<{ Date: string; Amount: string }>) => {
   return monthArray;
 };
 
+const dollarFormat = (value: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(value);
+
 const App = () => {
   const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -166,7 +172,7 @@ const App = () => {
               }
             />
           </Group>
-          <Text ta="center" color="dimmed" size="lg">
+          <Text ta="center" c="dimmed" size="lg">
             Upload your CSV file to visualize monthly revenue trends.
           </Text>
 
@@ -233,7 +239,8 @@ const App = () => {
                 textShadow: "1px 1px 5px rgba(0, 0, 0, 0.1)",
               })}
             >
-              Total Earnings: ${totalEarnings.toLocaleString()}
+              Total earnings over {chartData.length} months: <br />
+              {dollarFormat(totalEarnings)}
             </Text>
           )}
 
@@ -250,12 +257,7 @@ const App = () => {
                     colorScheme === "dark" ? colors.green[4] : colors.green[7],
                 },
               ]}
-              valueFormatter={(value) =>
-                new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }).format(value)
-              }
+              valueFormatter={dollarFormat}
               withBarValueLabel
               valueLabelProps={{
                 position: "top",
