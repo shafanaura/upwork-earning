@@ -64,10 +64,13 @@ const groupByMonth = (data: Array<{ Date: string; Amount: string }>) => {
 
   // Convert to array and ensure proper sorting
   const monthArray = Object.entries(groupedData)
-    .map(([month, earn]) => ({
-      month,
-      earn,
-    }))
+    .map(([month, earn]) => {
+      const date = dayjs(`${month}-01`);
+      return {
+        month: date.format("MMMM YYYY"),
+        earn,
+      };
+    })
     .sort((a, b) => {
       const [yearA, monthA] = a.month.split("-").map(Number);
       const [yearB, monthB] = b.month.split("-").map(Number);
@@ -121,7 +124,7 @@ const App = () => {
   });
 
   return (
-    <Container size="xl" pt={100} pb="xl" mih="100vh">
+    <Container size="lg" pt={100} pb="xl" mih="100vh">
       <Card
         shadow="xl"
         padding="xl"
@@ -184,7 +187,7 @@ const App = () => {
               "&:hover": {
                 backgroundColor:
                   colorScheme === "dark"
-                    ? theme.colors.dark[6]
+                    ? theme.colors.dark[7]
                     : theme.colors.gray[2],
               },
             })}
@@ -242,11 +245,11 @@ const App = () => {
               series={[
                 {
                   name: "earn",
+                  label: "Earning:",
                   color:
                     colorScheme === "dark" ? colors.green[4] : colors.green[7],
                 },
               ]}
-              tickLine="y"
               valueFormatter={(value) =>
                 new Intl.NumberFormat("en-US", {
                   style: "currency",
@@ -256,9 +259,16 @@ const App = () => {
               withBarValueLabel
               valueLabelProps={{
                 position: "top",
-                fill: colorScheme === "dark" ? colors.dark[0] : colors.dark[6],
+                fill: colorScheme === "dark" ? colors.dark[0] : colors.dark[7],
                 fontWeight: 500,
                 fontSize: 14,
+              }}
+              xAxisProps={{
+                angle: -45,
+                textAnchor: "end",
+                fontSize: 12,
+                fill: colorScheme === "dark" ? colors.dark[0] : colors.dark[7],
+                height: 50,
               }}
             />
           )}
