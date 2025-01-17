@@ -67,7 +67,7 @@ const groupByMonth = (data: Array<{ Date: string; Amount: string }>) => {
     .map(([month, earn]) => {
       const date = dayjs(`${month}-01`);
       return {
-        month: date.format("MMMM YYYY"),
+        month: date.format("MMM YYYY"),
         earn,
       };
     })
